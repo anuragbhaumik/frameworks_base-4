@@ -97,11 +97,11 @@ public class NavigationBarInflaterView extends FrameLayout
     private static final String KEY_KEYBOARD_NO_NAVIGATION =
             Settings.Secure.KEYBOARD_NO_NAVIGATION_BAR;
     private static final String OVERLAY_NAVIGATION_HIDE_HINT =
-            "org.derpfest.overlay.customization.navbar.nohint";
+            "org.derp.overlay.customization.navbar.nohint";
     private static final String OVERLAY_LAUNCHER3_HIDE_HINT =
-            "org.derpfest.overlay.customization.launcher3.nohint";
+            "org.derp.overlay.customization.launcher3.nohint";
     private static final String OVERLAY_KEYBOARD_HIDE_NAVIGATION =
-            "org.derpfest.overlay.customization.navbar.keyboard.nonavbar";
+            "org.derp.overlay.customization.navbar.keyboard.nonavbar";
 
     private final ContentResolver mContentResolver;
 
