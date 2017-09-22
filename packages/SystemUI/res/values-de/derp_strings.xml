@@ -235,4 +235,7 @@
     <!-- Glove Mode Tile -->
     <string name="quick_settings_glove_mode_label">Glove-Modus</string>
 
+    <!-- SystemUI tuner -->
+    <string name="lockscreen_default">Standard</string>
+    <string name="lockscreen_hidden">Keine</string>
 </resources>
