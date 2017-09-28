@@ -3869,6 +3869,11 @@ public class CentralSurfacesImpl extends CoreStartable implements
     }
 
     @Override
+    public void onCustomHintStarted() {
+        mKeyguardIndicationController.showTransientIndication(R.string.custom_hint);
+    }
+
+    @Override
     public void onTrackingStopped(boolean expand) {
     }
 
