@@ -67,6 +67,7 @@ public class LockIcon extends KeyguardAffordanceView {
 
             int newState = mState;
             Drawable icon = getIcon(newState);
+            setImageDrawable(icon, false, false);
             mIsFaceUnlock = newState == STATE_SCANNING_FACE;
 
             if (mIsFaceUnlock) {
@@ -75,7 +76,7 @@ public class LockIcon extends KeyguardAffordanceView {
                         R.string.accessibility_scanning_face));
             }
 
-            setImageDrawable(icon, false);
+            setImageDrawable(icon, false, false);
             shakeFace();
 
             if (icon instanceof AnimatedVectorDrawable) {
