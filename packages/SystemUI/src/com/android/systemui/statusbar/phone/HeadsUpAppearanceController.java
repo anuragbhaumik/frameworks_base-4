@@ -20,6 +20,7 @@ import static com.android.systemui.statusbar.phone.fragment.dagger.StatusBarFrag
 
 import android.graphics.Rect;
 import android.view.View;
+import android.widget.LinearLayout;
 
 import com.android.internal.annotations.VisibleForTesting;
 import com.android.internal.widget.ViewClippingUtil;
@@ -73,7 +74,7 @@ public class HeadsUpAppearanceController extends ViewController<HeadsUpStatusBar
     private final StatusBarStateController mStatusBarStateController;
     private final CommandQueue mCommandQueue;
     private final NotificationWakeUpCoordinator mWakeUpCoordinator;
-
+    private final LinearLayout mCustomIconArea;
     private final Optional<View> mOperatorNameViewOptional;
 
     @VisibleForTesting
@@ -109,6 +110,7 @@ public class HeadsUpAppearanceController extends ViewController<HeadsUpStatusBar
             NotificationPanelViewController notificationPanelViewController,
             HeadsUpStatusBarView headsUpStatusBarView,
             @Named(OPERATOR_NAME_FRAME_VIEW) Optional<View> operatorNameViewOptional,
+            LinearLayout customIconArea,
             @RootView PhoneStatusBarView statusBarView) {
         super(headsUpStatusBarView);
         mNotificationIconAreaController = notificationIconAreaController;
@@ -127,6 +129,7 @@ public class HeadsUpAppearanceController extends ViewController<HeadsUpStatusBar
         mStackScrollerController.setHeadsUpAppearanceController(this);
         mClockController = new ClockController(statusBarView.getContext(), statusBarView);
         mOperatorNameViewOptional = operatorNameViewOptional;
+        mCustomIconArea = customIconArea;
         mDarkIconDispatcher = darkIconDispatcher;
 
         mView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
@@ -230,11 +233,13 @@ public class HeadsUpAppearanceController extends ViewController<HeadsUpStatusBar
                 if (mLyricViewController != null) {
                     mLyricViewController.hideLyricView(mAnimationsEnabled);
                 }
+                hide(mCustomIconArea, View.INVISIBLE);
             } else {
                 if (!isRightClock) {
                     show(clockView);
                 }
                 mOperatorNameViewOptional.ifPresent(this::show);
+                show(mCustomIconArea);
                 hide(mView, View.GONE, () -> {
                     updateParentClipping(true /* shouldClip */);
                 });
