@@ -29,8 +29,11 @@ import android.annotation.Nullable;
 import android.annotation.SuppressLint;
 import android.app.Fragment;
 import android.content.Context;
+import android.content.ContentResolver;
+import android.database.ContentObserver;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.os.Handler;
 import android.os.UserHandle;
 import android.provider.Settings;
 import android.telephony.SubscriptionManager;
@@ -127,6 +130,31 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
     private boolean mIsClockBlacklisted;
 
     private LyricController mLyricController;
+
+    private View mCustomCarrierLabel;
+    private int mShowCarrierLabel;
+
+    private final Handler mHandler = new Handler();
+
+    private class SettingsObserver extends ContentObserver {
+        SettingsObserver(Handler handler) {
+            super(handler);
+        }
+
+        void observe() {
+            mContentResolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_SHOW_CARRIER),
+                    false, this, UserHandle.USER_ALL);
+        }
+
+        @Override
+        public void onChange(boolean selfChange) {
+            updateSettings(true);
+        }
+    }
+
+    private SettingsObserver mSettingsObserver;
+    private ContentResolver mContentResolver;
 
     private List<String> mBlockedIcons = new ArrayList<>();
 
@@ -228,6 +256,8 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
                     savedInstanceState.getSparseParcelableArray(EXTRA_PANEL_STATE));
         }
         mDarkIconManager = new DarkIconManager(view.findViewById(R.id.statusIcons), mFeatureFlags);
+        mContentResolver = getContext().getContentResolver();
+        mSettingsObserver = new SettingsObserver(mHandler);
         mDarkIconManager.setShouldLog(true);
         mBlockedIcons = Arrays.asList(getResources().getStringArray(
                 R.array.config_collapsed_statusbar_icon_blocklist));
@@ -235,6 +265,7 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
         mStatusBarIconController.addIconGroup(mDarkIconManager);
         mSystemIconArea = mStatusBar.findViewById(R.id.system_icon_area);
         mClockController = mStatusBar.getClockController();
+        mCustomCarrierLabel = mStatusBar.findViewById(R.id.statusbar_carrier_text);
         mOngoingCallChip = mStatusBar.findViewById(R.id.ongoing_call_chip);
         mStatusBarLogo = mStatusBar.findViewById(R.id.statusbar_logo);
         mStatusBarLogoRight = mStatusBar.findViewById(R.id.statusbar_logo_right);
@@ -244,6 +275,8 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
         initOperatorName();
         initNotificationIconArea();
         mLyricController = new LyricController(getContext(), mStatusBar);
+        mSettingsObserver.observe();
+        updateSettings(false);
         mStatusBarFragmentComponent.getHeadsUpAppearanceController().setLyricViewController(mLyricController);
         Dependency.get(TunerService.class).addTunable(this, StatusBarIconController.ICON_HIDE_LIST);
         Dependency.get(TunerService.class).addTunable(this, Settings.Secure.STATUS_BAR_SHOW_LYRIC);
@@ -359,9 +392,11 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
             if ((state1 & DISABLE_SYSTEM_INFO) != 0 || ((state2 & DISABLE2_SYSTEM_ICONS) != 0)) {
                 hideSystemIconArea(animate);
                 hideOperatorName(animate);
+                hideCarrierName(animate);
             } else {
                 showSystemIconArea(animate);
                 showOperatorName(animate);
+                showCarrierName(animate);
             }
         }
 
@@ -544,6 +579,18 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
         }
     }
 
+    public void hideCarrierName(boolean animate) {
+        if (mCustomCarrierLabel != null) {
+            animateHide(mCustomCarrierLabel, animate, true);
+        }
+    }
+
+    public void showCarrierName(boolean animate) {
+        if (mCustomCarrierLabel != null) {
+            setCarrierLabel(animate);
+        }
+    }
+
     /**
      * Animate a view to INVISIBLE or GONE
      */
@@ -672,6 +719,23 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
                 }
             };
 
+    public void updateSettings(boolean animate) {
+        mShowCarrierLabel = Settings.System.getIntForUser(mContentResolver,
+                Settings.System.STATUS_BAR_SHOW_CARRIER, 1,
+                UserHandle.USER_CURRENT);
+        setCarrierLabel(animate);
+    }
+
+    private void updateClockStyle(boolean animate) {
+        if (mClockStyle == 1 || mClockStyle == 2) {
+            animateHide(mClockView, animate, false);
+        } else {
+            if (((Clock)mClockView).isClockVisible()) {
+                    animateShow(mClockView, animate);
+            }
+        }
+    }
+
     private class LyricController extends LyricViewController {
         private View mLeftSide;
         private View mCenteredArea;
@@ -696,6 +760,14 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
             animateHide(getView(), animate);
             animateShow(mLeftSide, animate);
             animateShow(mCenteredArea, animate);
+        }
+    }
+
+    private void setCarrierLabel(boolean animate) {
+        if (mShowCarrierLabel == 2 || mShowCarrierLabel == 3) {
+            animateShow(mCustomCarrierLabel, animate);
+        } else {
+            animateHide(mCustomCarrierLabel, animate, false);
         }
     }
 }

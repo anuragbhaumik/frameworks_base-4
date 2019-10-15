@@ -53,6 +53,7 @@ import android.view.Surface;
 import com.android.internal.R;
 
 import java.util.List;
+import java.util.Locale;
 
 import com.android.internal.statusbar.IStatusBarService;
 
@@ -245,6 +246,10 @@ public class derpUtils {
         return telephony != null && telephony.isVoiceCapable();
     }
 
+    public static boolean isChineseLanguage() {
+       return Resources.getSystem().getConfiguration().locale.getLanguage().startsWith(
+               Locale.CHINESE.getLanguage());
+    }
 
     public static class QSLayoutUtils {
 
