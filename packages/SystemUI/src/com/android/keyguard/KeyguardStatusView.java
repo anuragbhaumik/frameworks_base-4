@@ -24,6 +24,7 @@ import android.graphics.Typeface;
 import android.os.Handler;
 import android.os.RemoteException;
 import android.os.UserHandle;
+import android.provider.Settings;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,6 +50,7 @@ public class KeyguardStatusView extends GridLayout {
     private KeyguardClockSwitch mClockView;
     private KeyguardSliceView mKeyguardSlice;
     private View mMediaHostContainer;
+    private KeyguardSliceView mKeyguardSliceView;
 
     private float mDarkAmount = 0;
     private int mTextColor;
@@ -76,12 +78,151 @@ public class KeyguardStatusView extends GridLayout {
         }
 
         mKeyguardSlice = findViewById(R.id.keyguard_slice_view);
+        mKeyguardSliceView = findViewById(R.id.keyguard_slice_view);
+
+        mClockView.refreshLockFont();
+        refreshLockDateFont();
+
         mTextColor = mClockView.getCurrentTextColor();
 
         mMediaHostContainer = findViewById(R.id.status_view_media_container);
 
-        mClockView.refreshLockFont();
         updateDark();
+    }
+
+    private int getLockDateFont() {
+        return Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.LOCK_DATE_FONTS, 23);
+    }
+
+    public void refreshLockDateFont() {
+        final Resources res = getContext().getResources();
+        boolean isPrimary = UserHandle.getCallingUserId() == UserHandle.USER_OWNER;
+        int lockDateFont = isPrimary ? getLockDateFont() : 23;
+
+        switch (lockDateFont) {
+        case 0:
+            mKeyguardSliceView.setViewsTypeface(Typeface.create("sans-serif", Typeface.BOLD));
+            break;
+        case 1:
+            mKeyguardSliceView.setViewsTypeface(Typeface.create("sans-serif", Typeface.NORMAL));
+            break;
+        case 2:
+            mKeyguardSliceView.setViewsTypeface(Typeface.create("sans-serif", Typeface.ITALIC));
+            break;
+        case 3:
+            mKeyguardSliceView.setViewsTypeface(Typeface.create("sans-serif", Typeface.BOLD_ITALIC));
+            break;
+        case 4:
+            mKeyguardSliceView.setViewsTypeface(Typeface.create("sans-serif-light", Typeface.NORMAL));
+            break;
+        case 5:
+            mKeyguardSliceView.setViewsTypeface(Typeface.create("sans-serif-thin", Typeface.NORMAL));
+            break;
+        case 6:
+            mKeyguardSliceView.setViewsTypeface(Typeface.create("sans-serif-condensed", Typeface.NORMAL));
+            break;
+        case 7:
+            mKeyguardSliceView.setViewsTypeface(Typeface.create("sans-serif-condensed", Typeface.ITALIC));
+            break;
+        case 8:
+            mKeyguardSliceView.setViewsTypeface(Typeface.create("sans-serif-condensed", Typeface.BOLD));
+            break;
+        case 9:
+            mKeyguardSliceView.setViewsTypeface(Typeface.create("sans-serif-condensed", Typeface.BOLD_ITALIC));
+            break;
+        case 10:
+            mKeyguardSliceView.setViewsTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
+            break;
+        case 11:
+            mKeyguardSliceView.setViewsTypeface(Typeface.create("sans-serif-medium", Typeface.ITALIC));
+            break;
+        case 12:
+            mKeyguardSliceView.setViewsTypeface(Typeface.create("abelreg", Typeface.NORMAL));
+            break;
+        case 13:
+            mKeyguardSliceView.setViewsTypeface(Typeface.create("adamcg-pro", Typeface.NORMAL));
+            break;
+        case 14:
+            mKeyguardSliceView.setViewsTypeface(Typeface.create("adventpro", Typeface.NORMAL));
+            break;
+        case 15:
+            mKeyguardSliceView.setViewsTypeface(Typeface.create("alien-league", Typeface.NORMAL));
+            break;
+        case 16:
+            mKeyguardSliceView.setViewsTypeface(Typeface.create("archivonar", Typeface.NORMAL));
+            break;
+        case 17:
+            mKeyguardSliceView.setViewsTypeface(Typeface.create("autourone", Typeface.NORMAL));
+            break;
+        case 18:
+            mKeyguardSliceView.setViewsTypeface(Typeface.create("badscript", Typeface.NORMAL));
+            break;
+        case 19:
+            mKeyguardSliceView.setViewsTypeface(Typeface.create("bignoodle-regular", Typeface.NORMAL));
+            break;
+        case 20:
+            mKeyguardSliceView.setViewsTypeface(Typeface.create("biko", Typeface.NORMAL));
+            break;
+        case 21:
+            mKeyguardSliceView.setViewsTypeface(Typeface.create("cherryswash", Typeface.NORMAL));
+            break;
+        case 22:
+            mKeyguardSliceView.setViewsTypeface(Typeface.create("ginora-sans", Typeface.NORMAL));
+            break;
+        case 23:
+        default:
+            mKeyguardSliceView.setViewsTypeface(Typeface.create("google-sans-text", Typeface.NORMAL));
+            break;
+        case 24:
+            mKeyguardSliceView.setViewsTypeface(Typeface.create("ibmplex-mono", Typeface.NORMAL));
+            break;
+        case 25:
+            mKeyguardSliceView.setViewsTypeface(Typeface.create("inkferno", Typeface.NORMAL));
+            break;
+        case 26:
+            mKeyguardSliceView.setViewsTypeface(Typeface.create("instruction", Typeface.NORMAL));
+            break;
+        case 27:
+            mKeyguardSliceView.setViewsTypeface(Typeface.create("jack-lane", Typeface.NORMAL));
+            break;
+        case 28:
+            mKeyguardSliceView.setViewsTypeface(Typeface.create("kellyslab", Typeface.NORMAL));
+            break;
+        case 29:
+            mKeyguardSliceView.setViewsTypeface(Typeface.create("monad", Typeface.NORMAL));
+            break;
+        case 30:
+            mKeyguardSliceView.setViewsTypeface(Typeface.create("noir", Typeface.NORMAL));
+            break;
+        case 31:
+            mKeyguardSliceView.setViewsTypeface(Typeface.create("outrun-future", Typeface.NORMAL));
+            break;
+        case 32:
+            mKeyguardSliceView.setViewsTypeface(Typeface.create("pompiere", Typeface.NORMAL));
+            break;
+        case 33:
+            mKeyguardSliceView.setViewsTypeface(Typeface.create("reemkufi", Typeface.NORMAL));
+            break;
+        case 34:
+            mKeyguardSliceView.setViewsTypeface(Typeface.create("riviera", Typeface.NORMAL));
+            break;
+        case 35:
+            mKeyguardSliceView.setViewsTypeface(Typeface.create("roadrage-sys", Typeface.NORMAL));
+            break;
+        case 36:
+            mKeyguardSliceView.setViewsTypeface(Typeface.create("the-outbox", Typeface.NORMAL));
+            break;
+        case 37:
+            mKeyguardSliceView.setViewsTypeface(Typeface.create("themeable-date", Typeface.NORMAL));
+            break;
+        case 38:
+            mKeyguardSliceView.setViewsTypeface(Typeface.create("vibur", Typeface.NORMAL));
+            break;
+        case 39:
+            mKeyguardSliceView.setViewsTypeface(Typeface.create("voltaire", Typeface.NORMAL));
+            break;
+        }
     }
 
     void setDarkAmount(float darkAmount) {
@@ -92,13 +233,14 @@ public class KeyguardStatusView extends GridLayout {
         mClockView.setDarkAmount(darkAmount);
         CrossFadeHelper.fadeOut(mMediaHostContainer, darkAmount);
         updateDark();
-        mClockView.refreshLockFont();
     }
 
     void updateDark() {
         final int blendedTextColor = ColorUtils.blendARGB(mTextColor, Color.WHITE, mDarkAmount);
         mKeyguardSlice.setDarkAmount(mDarkAmount);
         mClockView.setTextColor(blendedTextColor);
+        mClockView.refreshLockFont();
+        refreshLockDateFont();
     }
 
     /** Sets a translationY value on every child view except for the media view. */
