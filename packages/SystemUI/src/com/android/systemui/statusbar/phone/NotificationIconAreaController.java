@@ -2,6 +2,7 @@ package com.android.systemui.statusbar.phone;
 
 import android.app.NotificationManager;
 import android.content.Context;
+import android.content.ContentResolver;
 import android.content.res.Resources;
 import android.database.ContentObserver;
 import android.graphics.Color;
@@ -261,12 +262,27 @@ public class NotificationIconAreaController implements
                 mIconSize + 2 * mIconHPadding, mStatusBarWindowController.getStatusBarHeight());
     }
 
+    @NonNull
+    private FrameLayout.LayoutParams generateAodIconLayoutParams() {
+        return new FrameLayout.LayoutParams(getAodIconsSize(), getAodIconsSize());
+    }
+
     private void reloadDimens(Context context) {
         Resources res = context.getResources();
         mIconSize = res.getDimensionPixelSize(com.android.internal.R.dimen.status_bar_icon_size);
         mIconHPadding = res.getDimensionPixelSize(R.dimen.status_bar_icon_padding);
         mAodIconAppearTranslation = res.getDimensionPixelSize(
                 R.dimen.shelf_appear_translation);
+    }
+
+    private int getAodIconsSize() {
+        return Settings.System.getIntForUser(mContext.getContentResolver(),
+                Settings.System.AMBIENT_ICONS_SIZE, 80, UserHandle.USER_CURRENT);
+    }
+
+    private int getAodIconsColor() {
+        return Settings.System.getIntForUser(mContext.getContentResolver(),
+                Settings.System.AMBIENT_ICONS_COLOR, Color.WHITE, UserHandle.USER_CURRENT);
     }
 
     /**
@@ -477,6 +493,8 @@ public class NotificationIconAreaController implements
         }
 
         final FrameLayout.LayoutParams params = generateIconLayoutParams();
+        final FrameLayout.LayoutParams aodParams = generateAodIconLayoutParams();
+        final boolean isAodHostLayout = hostLayout == mAodIcons;
         for (int i = 0; i < toShow.size(); i++) {
             StatusBarIconView v = toShow.get(i);
             // The view might still be transiently added if it was just removed and added again
@@ -485,7 +503,7 @@ public class NotificationIconAreaController implements
                 if (hideDismissed) {
                     v.setOnDismissListener(mUpdateStatusBarIcons);
                 }
-                hostLayout.addView(v, i, params);
+                hostLayout.addView(v, i, isAodHostLayout ? aodParams : params);
             }
             v.setShowCount(mShowNotificationCount);
             v.updateIconForced();
@@ -501,7 +519,7 @@ public class NotificationIconAreaController implements
                 continue;
             }
             hostLayout.removeView(expected);
-            hostLayout.addView(expected, i);
+            hostLayout.addView(expected, i, isAodHostLayout ? aodParams : params);
         }
         hostLayout.setChangingViewPositions(false);
         hostLayout.setReplacingIcons(null);
@@ -608,8 +626,7 @@ public class NotificationIconAreaController implements
     }
 
     private void reloadAodColor() {
-        mAodIconTint = Utils.getColorAttrDefaultColor(mContext,
-                R.attr.wallpaperTextColor);
+        mAodIconTint = getAodIconsColor();
     }
 
     private void updateAodIconColors() {
@@ -649,8 +666,12 @@ public class NotificationIconAreaController implements
         if (mAodIcons == null) {
             return;
         }
+        boolean showIconsLockScreen = Settings.System.getIntForUser(mContext.getContentResolver(),
+                Settings.System.AMBIENT_ICONS_LOCKSCREEN,
+                0, UserHandle.USER_CURRENT) != 0;
         boolean visible = mBypassController.getBypassEnabled()
-                || mWakeUpCoordinator.getNotificationsFullyHidden();
+                || mWakeUpCoordinator.getNotificationsFullyHidden() || showIconsLockScreen;
+        mAodIcons.getLayoutParams().height = getAodIconsSize();
 
         // Hide the AOD icons if we're not in the KEYGUARD state unless the screen off animation is
         // playing, in which case we want them to be visible since we're animating in the AOD UI and
@@ -659,7 +680,7 @@ public class NotificationIconAreaController implements
                 && !mScreenOffAnimationController.shouldShowAodIconsWhenShade()) {
             visible = false;
         }
-        if (visible && mWakeUpCoordinator.isPulseExpanding()
+        if (visible && mWakeUpCoordinator.isPulseExpanding() && !showIconsLockScreen
                 && !mBypassController.getBypassEnabled()) {
             visible = false;
         }
