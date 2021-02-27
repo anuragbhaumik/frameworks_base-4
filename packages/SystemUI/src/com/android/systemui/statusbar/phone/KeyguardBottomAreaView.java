@@ -472,13 +472,8 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
     private void updateRightAffordanceIcon() {
         IconState state = mRightButton.getIcon();
         mRightAffordanceView.setVisibility(!mDozing && state.isVisible ? View.VISIBLE : View.GONE);
-        if (state.isVisible) {
-            if (state.drawable != mRightAffordanceView.getDrawable()
-                    || state.tint != mRightAffordanceView.shouldTint()
-                    || !state.isDefaultButton) {
-                mRightAffordanceView.setImageDrawable(state.drawable, state.tint,
-                    state.isDefaultButton ? false : true);
-            }
+        if (state.isVisible && state.drawable != null) {
+            mRightAffordanceView.setImageDrawable(state.drawable, state.tint, state.isDefaultButton ? false : true);
             mRightAffordanceView.setContentDescription(state.contentDescription);
         }
     }
@@ -564,13 +559,8 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
 
         IconState state = mLeftButton.getIcon();
         mLeftAffordanceView.setVisibility(state.isVisible ? View.VISIBLE : View.GONE);
-        if (state.isVisible) {
-            if (state.drawable != mLeftAffordanceView.getDrawable()
-                    || state.tint != mLeftAffordanceView.shouldTint()
-                    || !state.isDefaultButton) {
-                mLeftAffordanceView.setImageDrawable(state.drawable, state.tint,
-                    state.isDefaultButton ? false : true);
-            }
+        if (state.isVisible && state.drawable != null) {
+            mLeftAffordanceView.setImageDrawable(state.drawable, state.tint, state.isDefaultButton ? false : true);
             mLeftAffordanceView.setContentDescription(state.contentDescription);
         }
     }
@@ -579,6 +569,7 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
         if (mDozing
                 || mQuickAccessWalletController == null
                 || !mQuickAccessWalletController.isWalletEnabled()
+                || getRightIntent() != null
                 || !mHasCard) {
             mWalletButton.setVisibility(GONE);
 
@@ -606,6 +597,7 @@ public class KeyguardBottomAreaView extends FrameLayout implements View.OnClickL
         if (mDozing
                 || !hasFavorites
                 || !mControlServicesAvailable
+                || getLeftIntent() != null
                 || !mControlsComponent.getLockedVisibility()) {
             mControlsButton.setVisibility(GONE);
             if (mWalletButton.getVisibility() == GONE) {
