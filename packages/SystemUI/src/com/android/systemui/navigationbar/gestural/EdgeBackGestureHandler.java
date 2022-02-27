@@ -63,6 +63,7 @@ import android.view.WindowMetrics;
 import com.android.internal.config.sysui.SystemUiDeviceConfigFlags;
 import com.android.internal.policy.GestureNavigationSettingsObserver;
 import com.android.internal.util.LatencyTracker;
+import com.android.internal.util.derp.derpUtils;
 import com.android.systemui.R;
 import com.android.systemui.SystemUIFactory;
 import com.android.systemui.broadcast.BroadcastDispatcher;
@@ -336,7 +337,7 @@ public class EdgeBackGestureHandler extends CurrentUserTracker
         mFalsingManager = falsingManager;
         mLatencyTracker = latencyTracker;
         ComponentName recentsComponentName = ComponentName.unflattenFromString(
-                context.getString(com.android.internal.R.string.config_recentsComponentName));
+                derpUtils.LauncherUtils.getLauncherComponentName(context));
         if (recentsComponentName != null) {
             String recentsPackageName = recentsComponentName.getPackageName();
             PackageManager manager = context.getPackageManager();

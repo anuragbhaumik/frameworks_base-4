@@ -107,6 +107,7 @@ import com.android.internal.util.FrameworkStatsLog;
 import com.android.internal.widget.ILockSettings;
 import com.android.server.am.ActivityManagerService;
 import com.android.server.ambientcontext.AmbientContextManagerService;
+import com.android.server.app.CustomLauncherService;
 import com.android.server.appbinding.AppBindingService;
 import com.android.server.art.ArtManagerLocal;
 import com.android.server.attention.AttentionManagerService;
@@ -413,6 +414,8 @@ public final class SystemServer implements Dumpable {
             "com.android.server.media.MediaCommunicationService";
     private static final String APP_COMPAT_OVERRIDES_SERVICE_CLASS =
             "com.android.server.compat.overrides.AppCompatOverridesService$Lifecycle";
+    private static final String CUSTOM_LAUNCHER_SERVICE_CLASS =
+            "com.android.server.app.CustomLauncherService";
     private static final String SLEEP_MODE_SERVICE_CLASS =
             "com.android.server.power.SleepModeService";
 
@@ -2806,6 +2809,10 @@ public final class SystemServer implements Dumpable {
 
         t.traceBegin("AppCompatOverridesService");
         mSystemServiceManager.startService(APP_COMPAT_OVERRIDES_SERVICE_CLASS);
+        t.traceEnd();
+
+        t.traceBegin("StartCustomLauncherService");
+        mSystemServiceManager.startService(CUSTOM_LAUNCHER_SERVICE_CLASS);
         t.traceEnd();
 
         t.traceBegin("SleepModeService");

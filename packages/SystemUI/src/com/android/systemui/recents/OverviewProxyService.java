@@ -83,6 +83,7 @@ import com.android.internal.app.IVoiceInteractionSessionListener;
 import com.android.internal.logging.UiEventLogger;
 import com.android.internal.policy.ScreenDecorationsUtils;
 import com.android.internal.util.ScreenshotHelper;
+import com.android.internal.util.derp.derpUtils.LauncherUtils;
 import com.android.systemui.Dumpable;
 import com.android.systemui.broadcast.BroadcastDispatcher;
 import com.android.systemui.dagger.SysUISingleton;
@@ -612,8 +613,7 @@ public class OverviewProxyService extends CurrentUserTracker implements
         mNavBarControllerLazy = navBarControllerLazy;
         mStatusBarWinController = statusBarWinController;
         mConnectionBackoffAttempts = 0;
-        mRecentsComponentName = ComponentName.unflattenFromString(context.getString(
-                com.android.internal.R.string.config_recentsComponentName));
+        mRecentsComponentName = ComponentName.unflattenFromString(LauncherUtils.getLauncherComponentName(context));
         mQuickStepIntent = new Intent(ACTION_QUICKSTEP)
                 .setPackage(mRecentsComponentName.getPackageName());
         mWindowCornerRadius = ScreenDecorationsUtils.getWindowCornerRadius(mContext);
