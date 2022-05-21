@@ -132,6 +132,10 @@ public class KeyguardClockSwitch extends RelativeLayout {
                 R.dimen.keyguard_smartspace_top_offset);
     }
 
+    public void onThemeChanged() {
+        refreshLockFont();
+    }
+
     /**
      * Returns if this view is presenting a custom clock, or the default implementation.
      */
@@ -152,6 +156,7 @@ public class KeyguardClockSwitch extends RelativeLayout {
         refreshLockFont();
 
         onDensityOrFontScaleChanged();
+        onThemeChanged();
     }
 
     private int getLockClockFont() {
