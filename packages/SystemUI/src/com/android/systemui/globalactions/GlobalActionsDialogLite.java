@@ -1150,6 +1150,11 @@ public class GlobalActionsDialogLite implements DialogInterface.OnDismissListene
         public boolean showBeforeProvisioning() {
             return false;
         }
+
+        @Override
+        public boolean shouldShow() {
+            return false;
+        }
     }
 
     @VisibleForTesting
