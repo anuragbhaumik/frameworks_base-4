@@ -153,10 +153,9 @@ public class KeyguardClockSwitch extends RelativeLayout {
         mLargeClockView = findViewById(R.id.animatable_clock_view_large);
         mStatusArea = findViewById(R.id.keyguard_status_area);
 
-        refreshLockFont();
-
         onDensityOrFontScaleChanged();
         onThemeChanged();
+        refreshLockFont();
     }
 
     private int getLockClockFont() {
@@ -181,6 +180,7 @@ public class KeyguardClockSwitch extends RelativeLayout {
         if (plugin == null) {
             mClockView.setVisibility(View.VISIBLE);
             mLargeClockView.setVisibility(View.VISIBLE);
+            refreshLockFont();
             return;
         }
         // Attach small and big clock views to hierarchy.
@@ -205,7 +205,6 @@ public class KeyguardClockSwitch extends RelativeLayout {
         if (mColorPalette != null) {
             mClockPlugin.setColorPalette(mSupportsDarkText, mColorPalette);
         }
-        refreshLockFont();
     }
 
     /**
