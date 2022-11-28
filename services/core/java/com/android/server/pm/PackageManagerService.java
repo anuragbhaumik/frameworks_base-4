@@ -184,6 +184,7 @@ import com.android.internal.util.DumpUtils;
 import com.android.internal.util.FrameworkStatsLog;
 import com.android.internal.util.FunctionalUtils;
 import com.android.internal.util.Preconditions;
+import com.android.internal.util.derp.derpUtils.LauncherUtils;
 import com.android.permission.persistence.RuntimePermissionsPersistence;
 import com.android.server.EventLogTags;
 import com.android.server.FgThread;
@@ -2015,7 +2016,7 @@ public class PackageManagerService implements PackageSender, TestUtilityService 
             mOverlayConfigSignaturePackage = ensureSystemPackageName(computer,
                     mInjector.getSystemConfig().getOverlayConfigSignaturePackage());
             mRecentsPackage = ensureSystemPackageName(computer,
-                    getPackageFromComponentString(R.string.config_recentsComponentName));
+                    getPackageFromComponentString(LauncherUtils.getLauncherComponentName(context));
             mAmbientContextDetectionPackage = ensureSystemPackageName(computer,
                     getPackageFromComponentString(
                             R.string.config_defaultAmbientContextDetectionService));
