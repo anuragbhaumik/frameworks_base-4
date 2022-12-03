@@ -394,9 +394,8 @@ public class GlobalActionsDialog extends GlobalActionsDialogLite
         this::getWalletViewController, mSysuiColorExtractor,
                 mCentralSurfacesService, mNotificationShadeWindowController,
                 controlsAvailable(), uiController, this::onRefresh, mKeyguardShowing,
-                mPowerAdapter, mRestartAdapter, mUsersAdapter, mUiEventLogger,
-                mCentralSurfacesOptional, mKeyguardUpdateMonitor,
-                mLockPatternUtils);
+                mPowerAdapter, mRestartAdapter, mUiEventLogger, mCentralSurfacesOptional,
+                mKeyguardUpdateMonitor, mLockPatternUtils);
 
         dialog.setCanceledOnTouchOutside(false); // Handled by the custom class.
         dialog.setOnDismissListener(this);
@@ -466,13 +465,13 @@ public class GlobalActionsDialog extends GlobalActionsDialogLite
                 boolean controlsAvailable, @Nullable ControlsUiController controlsUiController,
                 Runnable onRotateCallback, boolean keyguardShowing,
                 MyPowerOptionsAdapter powerAdapter, MyRestartOptionsAdapter restartAdapter,
-                MyUsersAdapter usersAdapter, UiEventLogger uiEventLogger,
-                Optional<CentralSurfaces> statusBarOptional, KeyguardUpdateMonitor keyguardUpdateMonitor,
+                UiEventLogger uiEventLogger, Optional<CentralSurfaces> statusBarOptional,
+                KeyguardUpdateMonitor keyguardUpdateMonitor,
                 LockPatternUtils lockPatternUtils) {
             super(context, com.android.systemui.R.style.Theme_SystemUI_Dialog_GlobalActions,
                     adapter, overflowAdapter, sysuiColorExtractor, statusBarService,
                     notificationShadeWindowController, onRotateCallback,
-                    keyguardShowing, powerAdapter, restartAdapter, usersAdapter, uiEventLogger, statusBarOptional,
+                    keyguardShowing, powerAdapter, restartAdapter, uiEventLogger, statusBarOptional,
                     keyguardUpdateMonitor, lockPatternUtils);
             mControlsAvailable = controlsAvailable;
             mControlsUiController = controlsUiController;
