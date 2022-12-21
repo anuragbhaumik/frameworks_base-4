@@ -61,7 +61,7 @@
     <bool name="config_fingerprintWakeAndUnlock">true</bool>
 
     <!-- Whether show refresh rate QS tile -->
-    <bool name="config_showRefreshRateQsTile">false</bool>
+    <bool name="config_showRefreshRateQsTile">true</bool>
 
     <!-- The maximum number of tiles in the QuickQSPanel -->
     <integer name="quick_qs_panel_max_tiles_custom">4</integer>
