@@ -47,6 +47,9 @@ class NotificationsQSContainerController @Inject constructor(
                 mView.invalidate()
             }
         }
+    var qsTopMargin = 0
+    var topMargin = 0
+
     private var splitShadeEnabled = false
     private var isQSDetailShowing = false
     private var isQSCustomizing = false
@@ -60,7 +63,6 @@ class NotificationsQSContainerController @Inject constructor(
     private var bottomStableInsets = 0
     private var bottomCutoutInsets = 0
     private var panelMarginHorizontal = 0
-    private var topMargin = 0
 
     private val useCombinedQSHeaders = featureFlags.isEnabled(Flags.COMBINED_QS_HEADERS)
 
@@ -129,11 +131,6 @@ class NotificationsQSContainerController @Inject constructor(
                 resources.getDimensionPixelSize(R.dimen.large_screen_shade_header_height)
         panelMarginHorizontal = resources.getDimensionPixelSize(
                 R.dimen.notification_panel_margin_horizontal)
-        topMargin = if (largeScreenShadeHeaderActive) {
-            largeScreenShadeHeaderHeight
-        } else {
-            resources.getDimensionPixelSize(R.dimen.notification_panel_margin_top)
-        }
         updateConstraints()
 
         val scrimMarginChanged = ::scrimShadeBottomMargin.setAndReportChange(
@@ -250,7 +247,7 @@ class NotificationsQSContainerController @Inject constructor(
             connect(R.id.qs_frame, END, endConstraintId, END)
             setMargin(R.id.qs_frame, START, if (splitShadeEnabled) 0 else panelMarginHorizontal)
             setMargin(R.id.qs_frame, END, if (splitShadeEnabled) 0 else panelMarginHorizontal)
-            setMargin(R.id.qs_frame, TOP, topMargin)
+            setMargin(R.id.qs_frame, TOP, qsTopMargin)
         }
     }
 
