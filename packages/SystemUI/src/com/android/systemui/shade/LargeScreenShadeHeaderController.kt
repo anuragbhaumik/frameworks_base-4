@@ -19,11 +19,17 @@ package com.android.systemui.shade
 import android.annotation.IdRes
 import android.app.StatusBarManager
 import android.content.Context
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.content.res.Configuration
+import android.net.Uri
 import android.graphics.Color
 import android.os.Trace
 import android.os.Trace.TRACE_TAG_APP
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.provider.AlarmClock
+import android.provider.CalendarContract
 import android.util.Pair
 import android.view.View
 import android.view.WindowInsets
@@ -31,6 +37,7 @@ import android.widget.TextView
 import androidx.annotation.VisibleForTesting
 import androidx.constraintlayout.motion.widget.MotionLayout
 import com.android.settingslib.Utils
+import com.android.systemui.Dependency
 import com.android.systemui.Dumpable
 import com.android.systemui.R
 import com.android.systemui.animation.Interpolators
@@ -40,6 +47,7 @@ import com.android.systemui.battery.BatteryMeterViewController
 import com.android.systemui.dump.DumpManager
 import com.android.systemui.flags.FeatureFlags
 import com.android.systemui.flags.Flags
+import com.android.systemui.plugins.ActivityStarter
 import com.android.systemui.qs.ChipVisibilityListener
 import com.android.systemui.qs.HeaderPrivacyIconsController
 import com.android.systemui.qs.carrier.QSCarrierGroup
@@ -93,8 +101,9 @@ class LargeScreenShadeHeaderController @Inject constructor(
     private val dumpManager: DumpManager,
     private val featureFlags: FeatureFlags,
     private val qsCarrierGroupControllerBuilder: QSCarrierGroupController.Builder,
-    private val combinedShadeHeadersConstraintManager: CombinedShadeHeadersConstraintManager
-) : ViewController<View>(header), Dumpable {
+    private val combinedShadeHeadersConstraintManager: CombinedShadeHeadersConstraintManager,
+    private val activityStarter: ActivityStarter
+) : ViewController<View>(header), Dumpable, View.OnClickListener, View.OnLongClickListener {
 
     companion object {
         /** IDs for transitions and constraints for the [MotionLayout]. These are only used when
@@ -134,6 +143,7 @@ class LargeScreenShadeHeaderController @Inject constructor(
     private val date: TextView = header.findViewById(R.id.date)
     private val iconContainer: StatusIconContainer = header.findViewById(R.id.statusIcons)
     private val qsCarrierGroup: QSCarrierGroup = header.findViewById(R.id.carrier_group)
+    private val vibrator: Vibrator = header.context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
 
     private var cutoutLeft = 0
     private var cutoutRight = 0
@@ -150,6 +160,7 @@ class LargeScreenShadeHeaderController @Inject constructor(
             field = value
             updateListeners()
         }
+    private var privacyChipVisible = false
 
     /**
      * Whether the QQS/QS part of the shade is visible. This is particularly important in
@@ -226,6 +237,8 @@ class LargeScreenShadeHeaderController @Inject constructor(
                     .privacyChipVisibilityConstraints(visible)
                 header.updateAllConstraints(update)
             }
+            privacyChipVisible = visible
+            setBatteryClickable(qsExpandedFraction == 1f || !visible)
         }
     }
 
@@ -281,6 +294,39 @@ class LargeScreenShadeHeaderController @Inject constructor(
         qsCarrierGroupController = qsCarrierGroupControllerBuilder
             .setQSCarrierGroup(qsCarrierGroup)
             .build()
+
+        // click actions
+        clock.setOnClickListener(this)
+        date.setOnClickListener(this)
+        setBatteryClickable(true)
+    }
+
+    override fun onClick(v: View) {
+        if (v == clock) {
+            activityStarter.postStartActivityDismissingKeyguard(Intent(
+                    AlarmClock.ACTION_SHOW_ALARMS), 0)
+        } else if (v == date) {
+            val builder: Uri.Builder = CalendarContract.CONTENT_URI.buildUpon()
+            builder.appendPath("time")
+            builder.appendPath(System.currentTimeMillis().toString())
+            val todayIntent: Intent = Intent(Intent.ACTION_VIEW, builder.build())
+            activityStarter.postStartActivityDismissingKeyguard(todayIntent, 0)
+        } else if (v == batteryIcon) {
+            activityStarter.postStartActivityDismissingKeyguard(Intent(
+                    Intent.ACTION_POWER_USAGE_SUMMARY), 0)
+        }
+    }
+
+    override fun onLongClick(v: View): Boolean {
+        if (v == clock || v == date) {
+            val nIntent: Intent = Intent(Intent.ACTION_MAIN)
+            nIntent.setClassName("com.android.settings",
+                    "com.android.settings.Settings\$DateTimeSettingsActivity")
+            activityStarter.startActivity(nIntent, true /* dismissShade */)
+            vibrator.vibrate(VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE))
+            return true
+        }
+        return false
     }
 
     override fun onViewAttached() {
@@ -443,6 +489,7 @@ class LargeScreenShadeHeaderController @Inject constructor(
             )
             header.progress = qsExpandedFraction
         }
+        setBatteryClickable(qsExpandedFraction == 1f || !privacyChipVisible)
     }
 
     private fun updateListeners() {
@@ -538,5 +585,10 @@ class LargeScreenShadeHeaderController @Inject constructor(
         if (updates.largeScreenConstraintsChanges != null) {
             updateConstraints(LARGE_SCREEN_HEADER_CONSTRAINT, updates.largeScreenConstraintsChanges)
         }
+    }
+
+    private fun setBatteryClickable(clickable: Boolean) {
+        batteryIcon.setOnClickListener(if (clickable) this else null)
+        batteryIcon.setClickable(clickable)
     }
 }
