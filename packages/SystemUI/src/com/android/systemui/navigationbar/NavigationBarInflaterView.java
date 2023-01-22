@@ -523,7 +523,7 @@ public class NavigationBarInflaterView extends FrameLayout
         } else if (HOME_HANDLE.equals(button)) {
             v = inflater.inflate(R.layout.home_handle, parent, false);
             final ViewGroup.LayoutParams lp = v.getLayoutParams();
-            if (mHomeHandleWidthMode == 0) {
+            if (mHomeHandleWidthMode == 1) {
                 lp.width = getResources().getDimensionPixelSize(
                     R.dimen.navigation_home_handle_width_medium);
                 v.setLayoutParams(lp);
